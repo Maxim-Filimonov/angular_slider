@@ -7,6 +7,8 @@
 
 module.exports = require(process.env['LINEMAN_MAIN']).config.extend('application', {
 
+  // Enable Sass
+  enableSass: true,
   // html5push state simulation
   server: {
     pushState: true
@@ -16,7 +18,8 @@ module.exports = require(process.env['LINEMAN_MAIN']).config.extend('application
   loadNpmTasks: [
     "grunt-angular-templates",
     "grunt-concat-sourcemap",
-    "grunt-ngmin"
+    "grunt-ngmin",
+    "grunt-contrib-stylus"
   ],
 
   // we don't use the lineman default concat, handlebars, and jst tasks by default
@@ -27,7 +30,7 @@ module.exports = require(process.env['LINEMAN_MAIN']).config.extend('application
   // task override configuration
   prependTasks: {
     dist: ["ngmin"],         // ngmin should run in dist only
-    common: ["ngtemplates"] // ngtemplates runs in dist and dev
+    common: ["ngtemplates", 'stylus'] // ngtemplates runs in dist and dev
   },
 
   // swaps concat_sourcemap in place of vanilla concat
@@ -71,8 +74,15 @@ module.exports = require(process.env['LINEMAN_MAIN']).config.extend('application
       dest: "<%= files.js.concatenatedSpec %>"
     },
     css: {
-      src: ["<%= files.less.generatedVendor %>", "<%= files.sass.generatedVendor %>", "<%= files.css.vendor %>", "<%= files.less.generatedApp %>", "<%= files.sass.generatedApp %>", "<%= files.css.app %>"],
+      src: ["<%= files.less.generatedVendor %>", "<%= files.sass.generatedVendor %>", "<%= files.css.vendor %>", "<%= files.less.generatedApp %>", "<%= files.sass.generatedApp %>", "<%= files.stylus.generatedApp %>", "<%= files.css.app %>"],
       dest: "<%= files.css.concatenated %>"
+    }
+  },
+
+  stylus: {
+    compile: {
+      src: 'app/css/**/*.styl',
+      dest: 'generated/css/app.styl.css'
     }
   },
 
@@ -111,6 +121,10 @@ module.exports = require(process.env['LINEMAN_MAIN']).config.extend('application
     sass: {
       files: ["<%= files.sass.vendor %>", "<%= files.sass.app %>"],
       tasks: ["sass", "concat_sourcemap:css"]
+    },
+    stylus: {
+      files: ["<%= files.stylus.app %>"],
+      tasks: ["stylus", "concat_sourcemap:css"]
     }
   }
 
